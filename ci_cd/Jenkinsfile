@@ -1,1 +1,42 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_IMAGE = 'ecommerce-platform'
+        REGISTRY_URL = 'Yeshaswini17'
+        CLUSTER_NAME = '<Your_Kubernetes_Cluster_Name>'
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/Yeshaswini17/ecommerce-platform.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $REGISTRY_URL/$DOCKER_IMAGE:latest .'
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push $REGISTRY_URL/$DOCKER_IMAGE:latest'
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/deployment.yaml
+                kubectl rollout status deployment/ecommerce-platform
+                '''
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline executed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs.'
+        }
+    }
+}
  
