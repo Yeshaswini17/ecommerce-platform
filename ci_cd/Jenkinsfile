@@ -1,9 +1,9 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = 'ecommerce-platform'
-        REGISTRY_URL = 'Yeshaswini17'
-        CLUSTER_NAME = '<Your_Kubernetes_Cluster_Name>'
+        DOCKER_IMAGE = 'devops-app'
+        REGISTRY_URL = 'au-syd.icr.io/team-devops'
+        CLUSTER_NAME = 'my-k8s-cluster'
     }
     stages {
         stage('Checkout Code') {
@@ -13,7 +13,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $REGISTRY_URL/$DOCKER_IMAGE:latest .'
+                sh 'docker build -t $REGISTRY_URL/$DOCKER_IMAGE:latest .'                     
             }
         }
         stage('Push Docker Image') {
@@ -24,7 +24,8 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                kubectl apply -f k8s/deployment.yaml
+                kubectl apply -f configs/backend-deployment.yaml
+                kubectl apply -f configs/frontend-deployment.yaml
                 kubectl rollout status deployment/ecommerce-platform
                 '''
             }
@@ -40,3 +41,5 @@ pipeline {
     }
 }
  
+
+        
